@@ -4,12 +4,12 @@ export default class LinkedList {
     length = 0;
     headNode = null;
 
-    append(key, value) {
+    append(key, value, hash) {
         if (!this.headNode) {
-            this.headNode = new Node(key, value);
+            this.headNode = new Node(key, value, hash);
         } else {
             let lastNode = this.tail();
-            lastNode.next = new Node(key, value);
+            lastNode.next = new Node(key, value, hash);
         }
         this.length++;
     }
@@ -53,13 +53,13 @@ export default class LinkedList {
 
     // indexation starts at 0 (like an array)
     find(key) {
-        let index = 0;
         let currentNode = this.headNode;
-        while (currentNode) {
-            if (currentNode.key === key) return index;
+
+        for (let i = 0; currentNode; i++) {
+            if (currentNode.key === key) return i;
             currentNode = currentNode.next;
-            index++;
         }
+
         return null;
     }
 
