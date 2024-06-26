@@ -1,4 +1,10 @@
-import LinkedList from './linkedList';
+import LinkedList from './linkedList.js';
+
+/*  The snippet for "out of bounds" check weren't used here since everything is either accessed
+    through Array.forEach() and Array.reduce(), or through the following expression: 
+    bucketIndex = hashCode % buckets.length;
+    Result of modulo can't ever be less than 0 or more than its divisor, so I'm confident
+    we can't access anything out of bounds either */
 
 export default class HashMap {
     constructor(loadFactor = 0.75) {
@@ -24,7 +30,7 @@ export default class HashMap {
         return hashCode;
     }
 
-    /*  This info is needed for multiple functions.
+    /*  This info is needed for multiple functions - set(), get(), has() and remove().
         Returns hashcode for given key, bucket index (where it should go) and whether this key
         is in there already or not (index starting from 0 if it's in there, null otherwise)    */
     getInfoForKey(key) {
@@ -36,12 +42,11 @@ export default class HashMap {
     }
 
     set(key, value) {
-        const info = this.getInfoForKey(key);
+        //  check load and if needed - increase the hashmap size
+        if (this.length() / this.buckets.length >= this.loadFactor)
+            this.resizeHashMap();
 
-        // remove later
-        console.log(
-            `Hashcode ${info.hashCode} lands in a bucket with an index ${info.bucketIndex}`
-        );
+        const info = this.getInfoForKey(key);
 
         //  if there's no such key yet - add
         if (info.indexInList === null) {
@@ -121,5 +126,29 @@ export default class HashMap {
             }
         });
         return entriesArr;
+    }
+
+    resizeHashMap() {
+        // save every single key/value/hash bit of data
+        const nodeInfoArr = [];
+        this.buckets.forEach((list) => {
+            let currentNode = list.headNode;
+            while (currentNode) {
+                nodeInfoArr.push({
+                    key: currentNode.key,
+                    value: currentNode.value,
+                    hash: currentNode.hash,
+                });
+                currentNode = currentNode.next;
+            }
+        });
+
+        //  double map size
+        this.setHashMapSize(this.buckets.length * 2);
+        //  re-evaluate which node goes where and append them
+        nodeInfoArr.forEach((node) => {
+            const bucketIndex = node.hash % this.buckets.length;
+            this.buckets[bucketIndex].append(node.key, node.value, node.hash);
+        });
     }
 }
