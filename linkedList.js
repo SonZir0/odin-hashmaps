@@ -63,8 +63,8 @@ export default class LinkedList {
         return null;
     }
 
-    //  functions like pop() by default pass index to remove at index;
-    remove(index = this.length - 1) {
+    //  functions like pop() by default. Pass value to remove at index (start from 0)
+    removeAtIndex(index = this.length - 1) {
         if (!this.headNode) return; //  do nothing if list is empty
         if (index < 0 || index >= this.length)
             throw new Error('Index out of bounds!');
@@ -80,5 +80,10 @@ export default class LinkedList {
             currentNode.next = currentNode.next.next;
         }
         this.length--;
+    }
+
+    clear() {
+        this.headNode = null;
+        this.length = 0;
     }
 }

@@ -1,8 +1,6 @@
 import LinkedList from './linkedList';
 
 export default class HashMap {
-    elemCount = 0;
-
     constructor(loadFactor = 0.75) {
         this.loadFactor = loadFactor;
         this.setHashMapSize(16);
@@ -48,7 +46,6 @@ export default class HashMap {
         //  if there's no such key yet - add
         if (info.indexInList === null) {
             this.buckets[info.bucketIndex].append(key, value, info.hashCode);
-            this.elemCount++;
         } else {
             //  otherwise - overwrite
             this.buckets[info.bucketIndex].at(info.indexInList).update(value);
@@ -68,5 +65,61 @@ export default class HashMap {
         const info = this.getInfoForKey(key);
         if (info.indexInList !== null) return true;
         return false;
+    }
+
+    remove(key) {
+        const info = this.getInfoForKey(key);
+        if (info.indexInList !== null) {
+            this.buckets[info.bucketIndex].removeAtIndex(info.indexInList);
+            return true;
+        }
+        return false;
+    }
+
+    length() {
+        const total = this.buckets.reduce((lengthsSum, currentLinkedList) => {
+            return (lengthsSum += currentLinkedList.length);
+        }, 0);
+        return total;
+    }
+
+    clear() {
+        this.buckets.forEach((list) => list.clear());
+    }
+
+    keys() {
+        const keysArr = [];
+        this.buckets.forEach((list) => {
+            let currentNode = list.headNode;
+            while (currentNode) {
+                keysArr.push(currentNode.key);
+                currentNode = currentNode.next;
+            }
+        });
+        return keysArr;
+    }
+
+    values() {
+        const valuesArr = [];
+        this.buckets.forEach((list) => {
+            let currentNode = list.headNode;
+            while (currentNode) {
+                valuesArr.push(currentNode.value);
+                currentNode = currentNode.next;
+            }
+        });
+        return valuesArr;
+    }
+
+    entries() {
+        const entriesArr = [];
+        this.buckets.forEach((list) => {
+            let currentNode = list.headNode;
+            while (currentNode) {
+                entriesArr.push([currentNode.key, currentNode.value]);
+                currentNode = currentNode.next;
+            }
+        });
+        return entriesArr;
     }
 }
